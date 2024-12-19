@@ -35,21 +35,26 @@ keyboards = ReplyKeyboardMarkup(keyboard=[
 conn = sqlite3.connect('user.db')
 cursor = conn.cursor()
 
-cursor.execute('''
-CREATE TABLE IF NOT EXISTS users (
-   id INTEGER PRIMARY KEY,
-   telegram_id INTEGER UNIQUE,
-   name TEXT,
-   category1 TEXT,
-   category2 TEXT,
-   category3 TEXT,
-   expenses1 REAL,
-   expenses2 REAL,
-   expenses3 REAL
-   )
-''')
+def init_bd():
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS users (
+           id INTEGER PRIMARY KEY,
+           telegram_id INTEGER UNIQUE,
+           name TEXT,
+           category1 TEXT,
+           category2 TEXT,
+           category3 TEXT,
+           expenses1 REAL,
+           expenses2 REAL,
+           expenses3 REAL
+        )
+        ''')
+    conn.commit()
+    conn.close()
+    print("База данных создана и таблица users успешно добавлена.")
 
-conn.commit()
+init_bd()
+
 
 class FinancesForm(StatesGroup):
    category1 = State()
@@ -60,7 +65,7 @@ class FinancesForm(StatesGroup):
    expenses3 = State()
 
 
-@dp.message(Command('start'))
+@dp.message(CommandStart())
 async def send_start(message: Message):
    await message.answer("Привет! Я ваш личный финансовый помощник. Выберите одну из опций в меню:", reply_markup=keyboards)
 
